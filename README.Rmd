@@ -1,0 +1,61 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# dcdcr
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+dcdcr contains utilities to work with DataCamp Data Connector. 
+
+This package is designed to be used by administrators and managers of DataCamp groups. Some prior experience of writing reports with R is recommended.
+
+## Installation
+
+You can install the development version with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("datacamp/dcdcr")
+```
+## Before you begin
+
+You need to enable Data Connector in your DataCamp group, and set S3 credentials as environment variables, as described in [this Support article](https://support.datacamp.com/hc/en-us/articles/4405070893591-DataCamp-Data-Connector-A-Step-by-Step-Configuration-Guide-for-Automated-Data-Exports). If in doubt, speak to your Customer Success Manager.
+
+## Importing data
+
+Importing data requires two commands. First you set up the connector to S3, then you get the datasets. By default, all the data is returned for the most recent date.
+
+```{r import}
+library(dcdcr)
+# Setup connector to Amazon S3
+s3_conn <- create_s3_connector()
+
+# Retrieve all data on the latest date available
+dc <- get_dc_datasets(s3_conn)
+
+# See the results
+str(dc, 1, give.attr = FALSE)
+```
+
+You can specify which datasets are returned, on which date.
+
+```{r, team_only}
+dc_team <- get_dc_datasets(s3_conn, "team_dim", Sys.Date() - 7)
+dc_team
+```
+
+
