@@ -1,0 +1,23 @@
+Package: dcdcr
+Title: DataCamp Data Connector utilities in R
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "First",
+           family = "Last",
+           role = c("aut", "cre"),
+           email = "first.last@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Author: Richard Cotton [aut, cre], DataCamp [cph, fnd]
+Maintainer: Richard Cotton <richie@datacamp.com>
+Description: Utilities to make it easy to import and manipulate data from DataCamp Data Connector.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports:
+    magrittr,
+    paws,
+    purrr,
+    readr,
+    stringr
