@@ -19,5 +19,8 @@ Imports:
     magrittr,
     paws,
     purrr,
-    readr,
+    data.table,
     stringr
+Collate: 
+    'internal.R'
+    'import.R'

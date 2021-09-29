@@ -119,9 +119,10 @@ DC_DATASETS <- c(
 #' str(dc, 1, give.attr = FALSE)
 #' @seealso \code{\link{create_s3_connector}}, \code{\link{DC_DATASETS}}
 #' @importFrom magrittr %>%
-#' @importFrom purrr map
+#' @importFrom purrr map2
 #' @importFrom purrr set_names
 #' @export
+#' @include internal.R
 get_dc_datasets <- function(
   s3_conn, datasets = DC_DATASETS, date = "latest",
   bucket = Sys.getenv("AWS_S3_BUCKET_NAME"),
@@ -134,9 +135,30 @@ get_dc_datasets <- function(
     date <- format(date, "%Y-%m-%d")
   }
   filenames <- paste0(date, "/", datasets, ".csv")
-  dc <- filenames %>% 
-    map(read_object, s3_conn = s3_conn, bucket = bucket) %>% 
+  dc <- map2(
+      filenames, COLUMN_SPEC[datasets], 
+      ~ {
+        if(verbose) {
+          message("Reading ", .x)
+        }
+        read_object(.x, colClasses = .y, s3_conn = s3_conn, bucket = bucket) 
+      }
+    ) %>% 
     set_names(datasets)
+  
+  # Custom overrides for dodgy data columns
+  if(!is.null(dc$learning_practice_fact)) {
+    dc$learning_practice_fact$is_mobile <- as.logical(dc$learning_practice_fact$is_mobile)
+  }
+  if(!is.null(dc$project_dim)) {
+    dc$project_dim$is_guided <- dc$project_dim$is_guided == "t"
+  }
+  if(!is.null(dc$learning_exercise_fact)) {
+    dc$learning_exercise_fact$xp <- as.integer(dc$learning_exercise_fact$xp)
+  }
+  if(!is.null(dc$learning_practice_fact)) {
+    dc$learning_practice_fact$xp <- as.integer(dc$learning_practice_fact$xp)
+  }
   attr(dc, "date") <- date
   dc
 }
