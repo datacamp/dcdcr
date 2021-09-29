@@ -1,5 +1,5 @@
-get_dc_bucket <- function(s3_conn, bucket = Sys.getenv("AWS_S3_BUCKET_NAME")) {
-  s3_conn$list_objects_v2(Bucket = bucket)
+get_dc_bucket <- function(s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME")) {
+  s3_sess$list_objects_v2(Bucket = bucket)
 }
 
 #' @importFrom magrittr %>%
@@ -12,12 +12,21 @@ get_bucket_keys <- function(dc_bucket) {
 
 #' @importFrom purrr set_names
 #' @importFrom data.table fread
-read_object <- function(filename, s3_conn, bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), ...) {
-  obj <- s3_conn$get_object(
+#' @importFrom tibble as_tibble
+read_object <- function(filename, s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), colClasses) {
+  obj <- s3_sess$get_object(
     Bucket = bucket, 
     Key = filename
   )
-  fread(rawToChar(obj$Body), verbose = FALSE, ...)
+  txt <- rawToChar(obj$Body)
+  as_tibble(fread(text = txt, colClasses = colClasses, na.strings = c("NA", "")), .name_repair = "minimal")
+}
+
+is_yyyymmdd <- function(x) {
+  tryCatch(
+    inherits(as.Date(x), "Date"), 
+    error = function(e) FALSE
+  )
 }
 
 COLUMN_SPEC <- list(
@@ -57,12 +66,12 @@ COLUMN_SPEC <- list(
     id = "character",
     title = "character",
     type = "character",
-    xp = "integer",
+    xp = "character", # should be "integer" but needs manual override
     topic = "character",
     technology = "character",
     course_title = "character",
     course_slug = "character",
-    course_xp = "integer",           
+    course_xp = "character", # should be "integer" but needs manual override
     course_description = "character",
     course_short_description = "character",
     course_launched_date = "Date",

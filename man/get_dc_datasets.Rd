@@ -5,7 +5,7 @@
 \title{Get DataCamp Data Connector datasets}
 \usage{
 get_dc_datasets(
-  s3_conn,
+  s3_sess,
   datasets = DC_DATASETS,
   date = "latest",
   bucket = Sys.getenv("AWS_S3_BUCKET_NAME"),
@@ -13,7 +13,7 @@ get_dc_datasets(
 )
 }
 \arguments{
-\item{s3_conn}{An S3 data connector, as returned by \code{create_s3_connector}.}
+\item{s3_sess}{An S3 data connector, as returned by \code{create_s3_sessector}.}
 
 \item{datasets}{Names of the datasets to import.}
 
@@ -40,10 +40,10 @@ Sys.setenv(
   AWS_S3_BUCKET_NAME = "your bucket"
 )
 }
-s3_conn <- create_s3_connector()
-dc <- get_dc_datasets(s3_conn)
+s3_sess <- create_s3_sessector()
+dc <- get_dc_datasets(s3_sess)
 str(dc, 1, give.attr = FALSE)
 }
 \seealso{
-\code{\link{create_s3_connector}}, \code{\link{DC_DATASETS}}
+\code{\link{create_s3_sessector}}, \code{\link{DC_DATASETS}}
 }

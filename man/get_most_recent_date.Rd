@@ -5,13 +5,13 @@
 \title{Get the most recent date where data is available}
 \usage{
 get_most_recent_date(
-  s3_conn,
+  s3_sess,
   bucket = Sys.getenv("AWS_S3_BUCKET_NAME"),
   verbose = getOption("verbose")
 )
 }
 \arguments{
-\item{s3_conn}{An S3 data connector, as returned by \code{create_s3_connector}.}
+\item{s3_sess}{An S3 data connector, as returned by \code{create_s3_sessector}.}
 
 \item{bucket}{A string containing the DataCamp Data Connector bucket name.}
 
@@ -38,9 +38,9 @@ Sys.setenv(
   AWS_S3_BUCKET_NAME = "your bucket"
 )
 }
-s3_conn <- create_s3_connector()
-get_most_recent_date(s3_conn, verbose = TRUE)
+s3_sess <- create_s3_sessector()
+get_most_recent_date(s3_sess, verbose = TRUE)
 }
 \seealso{
-\code{\link{create_s3_connector}}
+\code{\link{create_s3_sessector}}
 }

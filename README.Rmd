@@ -41,11 +41,11 @@ Importing data requires two commands. First you set up the connector to S3, then
 
 ```{r import}
 library(dcdcr)
-# Setup connector to Amazon S3
-s3_conn <- create_s3_connector()
+# Setup Amazon S3 session
+s3_sess <- create_s3_session()
 
 # Retrieve all data on the latest date available
-dc <- get_dc_datasets(s3_conn)
+dc <- get_dc_datasets(s3_sess)
 
 # See the results
 str(dc, 1, give.attr = FALSE)
@@ -54,7 +54,7 @@ str(dc, 1, give.attr = FALSE)
 You can specify which datasets are returned, on which date.
 
 ```{r, team_only}
-dc_team <- get_dc_datasets(s3_conn, "team_dim", Sys.Date() - 7)
+dc_team <- get_dc_datasets(s3_sess, "team_dim", Sys.Date() - 7)
 dc_team
 ```
 
