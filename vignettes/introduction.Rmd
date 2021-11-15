@@ -1,0 +1,75 @@
+---
+title: "Introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, include = FALSE}
+library(dcdcr)
+library(dplyr)
+```
+
+Here are the currently available content types in the data model for which you can analyze your user progression on a daily basis (daily XP gained and time spent):
+
+- __Course__: A DataCamp course, e.g., Introduction to Python
+- __Chapter__: A chapter from a course, e.g., Grouping and Summarizing from the course Introduction to the Tidyverse
+- __Exercise__: An exercise from a chapter. Please note that a video is also considered as an exercise (and provides the users with XPs), e.g., Numerical EDA from the chapter Preparation, Exploration, and Visualization from the course Data Science for Everyone
+- __Project__: A guided or unguided project, e.g., Exploring the History of Lego
+- __Practice__: A practice users can take (on Mobile or in the browser), e.g., Joining Data with dplyr
+Assessment: A Signal Assessment, e.g, Statistics Fundamentals with R
+
+For a specific group, the fact tables contain rows for which users worked on content (e.g., exercise, assessment) while they were in this considered group. For example, imagine the following scenario:
+
+Group ID: 1234
+
+- January 1, 2021: User A joins group 1234
+- January 2, 2021: User A starts working on a course X
+- January 3, 2021: User A leaves group 1234 AND continues working on course X
+- January 4, 2021: User A joins group 1234
+- January 5, 2021: User A completed course X
+
+In this case, the fact tables for group 1234 and user A will contain rows for the following dates: January 2, 5, and won’t show data for January 3 (even though the user continued working on the course).
+
+Joining the fact tables to the dimension tables allows you to retrieve descriptive information about the content your users worked on (e.g., course title, course topic, maximum XP a user can gain by completing a specific chapter, ...).
+
+```{r echo = FALSE}
+docs_bic <- readr::read_rds('~/Desktop/docs_bic.Rds') %>% 
+  group_by(table_name, table_description) %>% 
+  tidyr::nest(columns = c(column, description))
+
+
+
+display_doc <- function(.table_name){
+  doc <- docs_bic %>% 
+    filter(table_name == .table_name)
+  cat(glue::glue('## {snakecase::to_title_case(doc$table_name)}\n'))
+  cat('\n', doc$table_description, "\n")
+  cat('\n### Columns\n')
+  doc %>% 
+    pull(columns) %>% 
+    magrittr::extract2(1) %>% 
+    knitr::kable() %>% 
+    print()
+}
+```
+
+
+```{r results='asis', echo = FALSE}
+.table_name <- 'exercise_dim'
+docs_bic %>% 
+  filter(table_name != 'docs') %>% 
+  arrange(table_name) %>% 
+  pull(table_name) %>% 
+  purrr::walk(display_doc)
+```
+

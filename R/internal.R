@@ -1,25 +1,10 @@
-get_dc_bucket <- function(s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME")) {
-  s3_sess$list_objects_v2(Bucket = bucket)
-}
-
-#' @importFrom magrittr %>%
-#' @importFrom purrr map_chr
-get_bucket_keys <- function(dc_bucket) {
-  dc_bucket$Contents %>% 
-    map_chr(~ .$Key) %>% 
-    unname()
-}
-
-#' @importFrom purrr set_names
-#' @importFrom data.table fread
-#' @importFrom tibble as_tibble
-read_object <- function(filename, s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), colClasses) {
-  obj <- s3_sess$get_object(
-    Bucket = bucket, 
-    Key = filename
+dc_read_table <- function(file, ...){
+  tibble::as_tibble(
+    data.table::fread(file = file, na.strings = c("NA", "")),
+    .name_repair = "minimal"
   )
-  txt <- rawToChar(obj$Body)
-  as_tibble(fread(text = txt, colClasses = colClasses, na.strings = c("NA", "")), .name_repair = "minimal")
+  # readr::read_csv(file, show_col_types = FALSE)
+  # vroom::vroom(file, show_col_types = FALSE)
 }
 
 is_yyyymmdd <- function(x) {
