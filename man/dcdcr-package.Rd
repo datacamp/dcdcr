@@ -6,8 +6,7 @@
 \alias{dcdcr-package}
 \title{dcdcr: DataCamp Data Connector utilities in R}
 \description{
-Utilities to make it easy to import and manipulate data from 
-  DataCamp Data Connector.
+Utilities to make it easy to import and manipulate data from DataCamp Data Connector.
 }
 \seealso{
 Useful links:

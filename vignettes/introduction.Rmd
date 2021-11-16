@@ -43,7 +43,7 @@ In this case, the fact tables for group 1234 and user A will contain rows for th
 Joining the fact tables to the dimension tables allows you to retrieve descriptive information about the content your users worked on (e.g., course title, course topic, maximum XP a user can gain by completing a specific chapter, ...).
 
 ```{r echo = FALSE}
-docs_bic <- readr::read_rds('~/Desktop/docs_bic.Rds') %>% 
+docs_bic <- dcdcr:::docs_bic %>% 
   group_by(table_name, table_description) %>% 
   tidyr::nest(columns = c(column, description))
 
