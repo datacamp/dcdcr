@@ -50,23 +50,23 @@ specific date.
 library(dcdcr)
 dc <- data_connector()
 dc$tbl_assessment_dim()
-#> # A tibble: 14 x 4
-#>       id title                         slug                           technology
-#>    <int> <chr>                         <chr>                          <chr>     
-#>  1  1663 Data Manipulation with Python data-manipulation-with-python  Python    
-#>  2  1649 R Programming                 r-programming                  R         
-#>  3  1979 Data Visualization with R     data-visualization-with-r      R         
-#>  4  1688 Machine Learning Fundamental… machine-learning-fundamentals… R         
-#>  5  1679 Python Programming            python-programming             Python    
-#>  6  1815 Data Analysis in SQL (Postgr… data-analysis-in-sql           SQL       
-#>  7  1714 Machine Learning Fundamental… machine-learning-fundamentals… Python    
-#>  8  1645 Data Manipulation with R      data-manipulation-with-r       R         
-#>  9  1742 Importing & Cleaning Data wi… importing-cleaning-data-with-… Python    
-#> 10  1882 Statistics Fundamentals with… statistics-fundamentals-with-… Python    
-#> 11  1874 Understanding and Interpreti… understanding-and-interpretin… Theory    
-#> 12  1936 Statistics Fundamentals with… statistics-fundamentals-with-r R         
-#> 13  1735 Importing & Cleaning Data wi… importing-cleaning-data-with-r R         
-#> 14  1857 Data Visualization with Pyth… data-visualization-with-python Python
+#> # A tibble: 14 × 4
+#>       id title                                   slug                 technology
+#>    <int> <chr>                                   <chr>                <chr>     
+#>  1  1874 Understanding and Interpreting Data     understanding-and-i… Theory    
+#>  2  1663 Data Manipulation with Python           data-manipulation-w… Python    
+#>  3  1649 R Programming                           r-programming        R         
+#>  4  1979 Data Visualization with R               data-visualization-… R         
+#>  5  1714 Machine Learning Fundamentals in Python machine-learning-fu… Python    
+#>  6  1735 Importing & Cleaning Data with R        importing-cleaning-… R         
+#>  7  1688 Machine Learning Fundamentals in R      machine-learning-fu… R         
+#>  8  1857 Data Visualization with Python          data-visualization-… Python    
+#>  9  1936 Statistics Fundamentals with R          statistics-fundamen… R         
+#> 10  1679 Python Programming                      python-programming   Python    
+#> 11  1815 Data Analysis in SQL (PostgreSQL)       data-analysis-in-sql SQL       
+#> 12  1645 Data Manipulation with R                data-manipulation-w… R         
+#> 13  1742 Importing & Cleaning Data with Python   importing-cleaning-… Python    
+#> 14  1882 Statistics Fundamentals with Python     statistics-fundamen… Python
 ```
 
 You can also print the documentation for each table by accessing the
