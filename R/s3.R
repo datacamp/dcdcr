@@ -17,9 +17,10 @@
 #'   AWS_SECRET_ACCESS_KEY = "your secret key",
 #'   AWS_REGION = "your region"
 #' )
-#' }
 #' s3_sess <- create_s3_session()
 #' str(s3_sess, 1)
+#' }
+
 #' @seealso \code{\link[paws]{s3}}
 #' @importFrom paws s3
 create_s3_session <- function(
