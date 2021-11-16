@@ -23,9 +23,9 @@
 #' @seealso \code{\link[paws]{s3}}
 #' @importFrom paws s3
 create_s3_session <- function(
-  access_key_id = Sys.getenv("AWS_ACCESS_KEY_ID"), 
-  secret_access_key = Sys.getenv("AWS_SECRET_ACCESS_KEY"), 
-  region = Sys.getenv("AWS_DEFAULT_REGION")) {
+  access_key_id = get_env_var_aws_access_key(), 
+  secret_access_key = get_env_var_aws_secret(), 
+  region = get_env_var_aws_region()) {
   paws::s3(
     config = list(
       credentials = list(
@@ -52,7 +52,7 @@ create_s3_session <- function(
 #' list_objects_s3() %>%
 #'   head()
 #' }
-list_objects_s3 <- function(bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), date = 'latest'){
+list_objects_s3 <- function(bucket = get_env_var_aws_bucket(), date = 'latest'){
   s3 <- create_s3_session()
   # usethis::ui_info("Fetching first 1000 objects ...")
   response <- s3$list_objects_v2(bucket, Prefix = date)
@@ -105,7 +105,7 @@ s3_tbl <- memoise::memoise(function(x, date = 'latest'){
   tryCatch(
     {
       s3$get_object(
-        Bucket = Sys.getenv("AWS_S3_BUCKET_NAME"),
+        Bucket = get_env_var_aws_bucket(),
         Key = key
       ) %>%
         magrittr::extract2('Body') %>%

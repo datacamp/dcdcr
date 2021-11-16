@@ -166,3 +166,31 @@ COLUMN_SPEC <- list(
     left_team_date = "Date"
   )
 )
+
+get_env_var_aws_bucket <- function() {
+  env_var <- Sys.getenv("AWS_BUCKET", Sys.getenv("AWS_S3_BUCKET_NAME", NA))
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_BUCKET' has not been set.")
+  }
+}
+
+get_env_var_aws_region <- function() {
+  env_var <- Sys.getenv("AWS_REGION", Sys.getenv("AWS_DEFAULT_REGION", NA))
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_REGION' has not been set.")
+  }
+}
+
+get_env_var_aws_access_key <- function() {
+  env_var <- Sys.getenv("AWS_ACCESS_KEY_ID", NA)
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_ACCESS_KEY_ID' has not been set.")
+  }
+}
+
+get_env_var_aws_secret <- function() {
+  env_var <- Sys.getenv("AWS_SECRET_ACCESS_KEY", NA)
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_SECRET_ACCESS_KEY' has not been set.")
+  }
+}
