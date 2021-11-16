@@ -3,7 +3,8 @@ Title: DataCamp Data Connector utilities in R
 Version: 0.1
 Authors@R: c(
       person("Richard", "Cotton", , "richie@datacamp.com", role = c("aut", "cre")),
-      person("Ramnath", "Vaidyanathan", , "ramnath@datacamp.com", role="aut")
+      person("Ramnath", "Vaidyanathan", , "ramnath@datacamp.com", role="aut"),
+      person(given = "DataCamp", role = c("cph", "fnd"))
     )
 Description:  Utilities to make it easy to import and manipulate data from 
   DataCamp Data Connector.

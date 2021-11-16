@@ -1,3 +1,9 @@
+authors:
+  Ramnath Vaidyanathan:
+    href: http://ramnathv.github.io
+  DataCamp:
+    href: http;//www.datacamp.com
+    html: <img src="https://www.datacamp.com/datacamp-sq.png?v=20102020" height="24" />
 template:
   params:
     bootswatch: cosmo

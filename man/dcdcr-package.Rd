@@ -25,5 +25,10 @@ Authors:
   \item Ramnath Vaidyanathan \email{ramnath@datacamp.com}
 }
 
+Other contributors:
+\itemize{
+  \item DataCamp [copyright holder, funder]
+}
+
 }
 \keyword{internal}
