@@ -1,8 +1,9 @@
 #' @importFrom tibble as_tibble
 #' @importFrom data.table fread
-dc_read_table <- function(file, ...){
-  as_tibble(
-    fread(file = file, na.strings = c("NA", "")),
+
+dc_read_table <- function(text, ...){
+  tibble::as_tibble(
+    data.table::fread(text = text, na.strings = c("NA", "")),
     .name_repair = "minimal"
   )
   # readr::read_csv(file, show_col_types = FALSE)
@@ -14,6 +15,18 @@ is_yyyymmdd <- function(x) {
     inherits(as.Date(x), "Date"), 
     error = function(e) FALSE
   )
+}
+
+get_missing_credentials <- function(x){
+  creds <- c(
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_BUCKET",
+    "AWS_REGION"
+  )
+  creds %>% 
+    purrr::keep(~ Sys.getenv(.x) == '')
+
 }
 
 COLUMN_SPEC <- list(

@@ -39,7 +39,6 @@ create_s3_session <- function(
   )
 }
 
-
 #' List objects in an S3 bucket
 #'
 #' @param bucket The name of the S3 bucket.
@@ -117,9 +116,9 @@ s3_tbl <- memoise(function(x, date = 'latest'){
         Bucket = get_env_var_aws_bucket(),
         Key = key
       ) %>%
-        extract2('Body') %>%
-        writeBin(con = tf)
-      dc_read_table(tf)
+        magrittr::extract2('Body') %>%
+        rawToChar() %>% 
+        dc_read_table()
     },
     error = function(e) {
       warning(sprintf("%s could not be read from S3.", key))
