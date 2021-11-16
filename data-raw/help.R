@@ -1,3 +1,7 @@
+library(tibble)
+library(dplyr)
+library(purrr)
+library(usethis)
 dag_tasks_bic <- dc_s3_read('dag_tasks.rds', type = 'prod') %>%
   filter(grepl('^bic_', task_id)) %>%
   filter(!(
@@ -6,17 +10,17 @@ dag_tasks_bic <- dc_s3_read('dag_tasks.rds', type = 'prod') %>%
 
 get_column_comments <- function(metadata){
   metadata$fields[[1]] %>%
-    tibble::enframe() %>%
-    mutate(value = purrr::map_chr(value, 1)) %>%
+    enframe() %>%
+    mutate(value = map_chr(value, 1)) %>%
     select(column = name, description = value) %>%
     mutate(column = tolower(column))
 }
 docs_bic <- dag_tasks_bic %>%
   mutate(tbl_fun_name = gsub("bic", "tbl", task_id)) %>%
-  mutate(column_comments = purrr::map(metadata, get_column_comments)) %>%
+  mutate(column_comments = map(metadata, get_column_comments)) %>%
   select(tbl_fun_name, column_comments, table_description = description)
 
-usethis::use_data(docs_bic, internal = TRUE, overwrite = TRUE)
+use_data(docs_bic, internal = TRUE, overwrite = TRUE)
 
 
 

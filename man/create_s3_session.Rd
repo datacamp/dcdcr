@@ -5,9 +5,9 @@
 \title{Create Amazon S3 session}
 \usage{
 create_s3_session(
-  access_key_id = Sys.getenv("AWS_ACCESS_KEY_ID"),
-  secret_access_key = Sys.getenv("AWS_SECRET_ACCESS_KEY"),
-  region = Sys.getenv("AWS_DEFAULT_REGION")
+  access_key_id = get_env_var_aws_access_key(),
+  secret_access_key = get_env_var_aws_secret(),
+  region = get_env_var_aws_region()
 )
 }
 \arguments{
@@ -32,7 +32,7 @@ variables.
 Sys.setenv(
   AWS_ACCESS_KEY_ID = "your access key ID",
   AWS_SECRET_ACCESS_KEY = "your secret key",
-  AWS_DEFAULT_REGION = "your default region"
+  AWS_REGION = "your region"
 )
 }
 s3_sess <- create_s3_session()

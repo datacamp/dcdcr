@@ -1,6 +1,8 @@
+#' @importFrom tibble as_tibble
+#' @importFrom data.table fread
 dc_read_table <- function(file, ...){
-  tibble::as_tibble(
-    data.table::fread(file = file, na.strings = c("NA", "")),
+  as_tibble(
+    fread(file = file, na.strings = c("NA", "")),
     .name_repair = "minimal"
   )
   # readr::read_csv(file, show_col_types = FALSE)

@@ -15,7 +15,7 @@
 #' Sys.setenv(
 #'   AWS_ACCESS_KEY_ID = "your access key ID",
 #'   AWS_SECRET_ACCESS_KEY = "your secret key",
-#'   AWS_DEFAULT_REGION = "your default region"
+#'   AWS_REGION = "your region"
 #' )
 #' }
 #' s3_sess <- create_s3_session()
@@ -26,7 +26,7 @@ create_s3_session <- function(
   access_key_id = get_env_var_aws_access_key(), 
   secret_access_key = get_env_var_aws_secret(), 
   region = get_env_var_aws_region()) {
-  paws::s3(
+  s3(
     config = list(
       credentials = list(
         creds = list(
@@ -52,6 +52,8 @@ create_s3_session <- function(
 #' list_objects_s3() %>%
 #'   head()
 #' }
+#' @importFrom purrr map_df
+#' @importFrom tools file_path_sans_ext
 list_objects_s3 <- function(bucket = get_env_var_aws_bucket(), date = 'latest'){
   s3 <- create_s3_session()
   # usethis::ui_info("Fetching first 1000 objects ...")
@@ -69,8 +71,8 @@ list_objects_s3 <- function(bucket = get_env_var_aws_bucket(), date = 'latest'){
     is_truncated <- response$IsTruncated
   }
   content %>%
-    purrr::map_df(~ list(
-      name = tools::file_path_sans_ext(basename(.x$Key)),
+    map_df(~ list(
+      name = file_path_sans_ext(basename(.x$Key)),
       key = .x$Key,
       last_modified = .x$LastModified
     ))
@@ -79,13 +81,16 @@ list_objects_s3 <- function(bucket = get_env_var_aws_bucket(), date = 'latest'){
 
 #' List tables in S3 bucket
 #'
+#' @importFrom dplyr pull
+#' @importFrom purrr discard
+#' @importFrom tools file_path_sans_ext
 #' @export
 list_tables_s3 <- function(){
   list_objects_s3() %>%
-    dplyr::pull(key) %>%
+    pull(key) %>%
     basename() %>%
-    tools::file_path_sans_ext() %>%
-    purrr::discard(~ grepl('^test', .))
+    file_path_sans_ext() %>%
+    discard(~ grepl('^test', .))
 }
 
 #' Read table from S3
@@ -96,19 +101,23 @@ list_tables_s3 <- function(){
 #' \dontrun{
 #' tbl_s3('chapter_dim')
 #' }
+#' @importFrom glue glue
+#' @importFrom magrittr extract2
+#' @importFrom memoise memoise
+#' @importFrom magrittr extract2
 #' @importFrom paws s3
-s3_tbl <- memoise::memoise(function(x, date = 'latest'){
+s3_tbl <- memoise(function(x, date = 'latest'){
   s3 <- create_s3_session()
   tf <- tempfile(fileext = '.csv')
-  file <- glue::glue('{date}/{x}.csv')
-  key <- glue::glue('{date}/{x}.csv')
+  file <- glue('{date}/{x}.csv')
+  key <- glue('{date}/{x}.csv')
   tryCatch(
     {
       s3$get_object(
         Bucket = get_env_var_aws_bucket(),
         Key = key
       ) %>%
-        magrittr::extract2('Body') %>%
+        extract2('Body') %>%
         writeBin(con = tf)
       dc_read_table(tf)
     },
@@ -119,54 +128,67 @@ s3_tbl <- memoise::memoise(function(x, date = 'latest'){
   )
 })
 
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr group_by
+#' @importFrom dplyr pull
+#' @importFrom magrittr extract2
+#' @importFrom purrr transpose
+#' @importFrom tidyr nest
 s3_tbl_docs <- function(){
   docs_bic %>%
-    dplyr::mutate(tbl_fun_name = paste0('tbl_', table_name)) %>%
-    dplyr::select(-table_name) %>%
-    dplyr::group_by(tbl_fun_name, table_description) %>%
-    tidyr::nest(column_comments = c(column, description))
+    mutate(tbl_fun_name = paste0('tbl_', table_name)) %>%
+    select(-table_name) %>%
+    group_by(tbl_fun_name, table_description) %>%
+    nest(column_comments = c(column, description))
 }
 
 #' Get help documents
 #'
 #' @param x The name of the table
+#' @importFrom dplyr filter
+#' @importFrom pointblank create_informant
+#' @importFrom pointblank info_tabular
+#' @importFrom pointblank info_columns
+#' @importFrom pointblank get_informant_report
+#' @importFrom snakecase to_title_case
 s3_help <- function(x){
   .tbl_fun_name = paste0('tbl_', x)
   doc <- s3_tbl_docs() %>%
-    dplyr::filter(tbl_fun_name == .tbl_fun_name)
+    filter(tbl_fun_name == .tbl_fun_name)
   
   if(nrow(doc) == 0) {
     warning(sprintf("No documentation is available for %s.", x), call. = FALSE)
     return(invisible())
   }
   column_comments <- doc %>%
-    dplyr::pull(column_comments) %>%
-    magrittr::extract2(1) %>%
+    pull(column_comments) %>%
+    extract2(1) %>%
     as.list() %>%
-    purrr::transpose()
+    transpose()
 
   informant <- s3_tbl(x) %>%
-    pointblank::create_informant(
+    create_informant(
       tbl = .,
       label = 'Data Connector'
     )
 
   informant <- informant %>%
-    pointblank::info_tabular(
+    info_tabular(
       summary = doc$table_description
     )
 
   for (column in column_comments){
     informant <- informant %>%
-      pointblank::info_columns(
+      info_columns(
         columns = column$column,
         info = column$description
       )
   }
 
   informant %>%
-    pointblank::get_informant_report(
-      title = snakecase::to_title_case(x),
+    get_informant_report(
+      title = to_title_case(x),
       size = 'small'
     )
 }
@@ -180,7 +202,7 @@ s3_help <- function(x){
 #' @importFrom memoise memoise
 create_accessors_s3 <- function(date = 'latest', env){
   list_tables_s3() %>%
-    purrr::walk(~ {
+    walk(~ {
       fun <- s3_tbl_binder(.x, date)
       class(fun) <- c('function_dc', class(fun))
       fun_name <- paste0('tbl_', .x)
