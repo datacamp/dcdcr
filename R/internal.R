@@ -1,25 +1,13 @@
-get_dc_bucket <- function(s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME")) {
-  s3_sess$list_objects_v2(Bucket = bucket)
-}
-
-#' @importFrom magrittr %>%
-#' @importFrom purrr map_chr
-get_bucket_keys <- function(dc_bucket) {
-  dc_bucket$Contents %>% 
-    map_chr(~ .$Key) %>% 
-    unname()
-}
-
-#' @importFrom purrr set_names
-#' @importFrom data.table fread
 #' @importFrom tibble as_tibble
-read_object <- function(filename, s3_sess, bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), colClasses) {
-  obj <- s3_sess$get_object(
-    Bucket = bucket, 
-    Key = filename
+#' @importFrom data.table fread
+
+dc_read_table <- function(text, ...){
+  tibble::as_tibble(
+    data.table::fread(text = text, na.strings = c("NA", "")),
+    .name_repair = "minimal"
   )
-  txt <- rawToChar(obj$Body)
-  as_tibble(fread(text = txt, colClasses = colClasses, na.strings = c("NA", "")), .name_repair = "minimal")
+  # readr::read_csv(file, show_col_types = FALSE)
+  # vroom::vroom(file, show_col_types = FALSE)
 }
 
 is_yyyymmdd <- function(x) {
@@ -27,6 +15,18 @@ is_yyyymmdd <- function(x) {
     inherits(as.Date(x), "Date"), 
     error = function(e) FALSE
   )
+}
+
+get_missing_credentials <- function(x){
+  creds <- c(
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_BUCKET",
+    "AWS_REGION"
+  )
+  creds %>% 
+    purrr::keep(~ Sys.getenv(.x) == '')
+
 }
 
 COLUMN_SPEC <- list(
@@ -181,3 +181,35 @@ COLUMN_SPEC <- list(
     left_team_date = "Date"
   )
 )
+
+get_env_var_aws_bucket <- function() {
+  env_var <- Sys.getenv("AWS_BUCKET", Sys.getenv("AWS_S3_BUCKET_NAME", NA))
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_BUCKET' has not been set.")
+  }
+  env_var
+}
+
+get_env_var_aws_region <- function() {
+  env_var <- Sys.getenv("AWS_REGION", Sys.getenv("AWS_DEFAULT_REGION", NA))
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_REGION' has not been set.")
+  }
+  env_var
+}
+
+get_env_var_aws_access_key <- function() {
+  env_var <- Sys.getenv("AWS_ACCESS_KEY_ID", NA)
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_ACCESS_KEY_ID' has not been set.")
+  }
+  env_var
+}
+
+get_env_var_aws_secret <- function() {
+  env_var <- Sys.getenv("AWS_SECRET_ACCESS_KEY", NA)
+  if(is.na(env_var)) {
+    stop("The environment variable 'AWS_SECRET_ACCESS_KEY' has not been set.")
+  }
+  env_var
+}
