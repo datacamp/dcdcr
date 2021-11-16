@@ -5,8 +5,7 @@
 data_connector <- function(date = "latest"){
   .tbl <- list_tables_s3() %>%
     purrr::map(~ {
-      fun_str <- sprintf('function(date = "%s"){s3_tbl("%s", date)}', date, .x)
-      fun <- eval(parse(text = fun_str))
+      fun <- s3_tbl_binder(.x, date)
       class(fun) <- c('function_dc', class(fun))
       attr(fun, "table") <- .x
       fun

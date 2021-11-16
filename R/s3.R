@@ -22,7 +22,6 @@
 #' str(s3_sess, 1)
 #' @seealso \code{\link[paws]{s3}}
 #' @importFrom paws s3
-#' @export
 create_s3_session <- function(
   access_key_id = Sys.getenv("AWS_ACCESS_KEY_ID"), 
   secret_access_key = Sys.getenv("AWS_SECRET_ACCESS_KEY"), 
@@ -135,7 +134,11 @@ s3_help <- function(x){
   .tbl_fun_name = paste0('tbl_', x)
   doc <- s3_tbl_docs() %>%
     dplyr::filter(tbl_fun_name == .tbl_fun_name)
-
+  
+  if(nrow(doc) == 0) {
+    warning(sprintf("No documentation is available for %s.", x), call. = FALSE)
+    return(invisible())
+  }
   column_comments <- doc %>%
     dplyr::pull(column_comments) %>%
     magrittr::extract2(1) %>%
@@ -178,9 +181,15 @@ s3_help <- function(x){
 create_accessors_s3 <- function(date = 'latest', env){
   list_tables_s3() %>%
     purrr::walk(~ {
-      fun_str <- sprintf('function(date = "latest"){s3_tbl("%s", date)}', .x)
-      fun <- eval(parse(text = fun_str))
+      fun <- s3_tbl_binder(.x, date)
+      class(fun) <- c('function_dc', class(fun))
       fun_name <- paste0('tbl_', .x)
-      assign(fun_name, fun_memoized, envir = env)
+      assign(fun_name, fun, envir = env)
     })
+}
+
+s3_tbl_binder <- function(x, date) {
+  function() {
+    s3_tbl(x, date)
+  }
 }

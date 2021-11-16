@@ -4,7 +4,7 @@
 \alias{list_objects_s3}
 \title{List objects in an S3 bucket}
 \usage{
-list_objects_s3(bucket = Sys.getenv("AWS_BUCKET"), date = "latest")
+list_objects_s3(bucket = Sys.getenv("AWS_S3_BUCKET_NAME"), date = "latest")
 }
 \arguments{
 \item{bucket}{The name of the S3 bucket.}
