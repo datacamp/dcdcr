@@ -187,6 +187,7 @@ get_env_var_aws_bucket <- function() {
   if(is.na(env_var)) {
     stop("The environment variable 'AWS_BUCKET' has not been set.")
   }
+  env_var
 }
 
 get_env_var_aws_region <- function() {
@@ -194,6 +195,7 @@ get_env_var_aws_region <- function() {
   if(is.na(env_var)) {
     stop("The environment variable 'AWS_REGION' has not been set.")
   }
+  env_var
 }
 
 get_env_var_aws_access_key <- function() {
@@ -201,6 +203,7 @@ get_env_var_aws_access_key <- function() {
   if(is.na(env_var)) {
     stop("The environment variable 'AWS_ACCESS_KEY_ID' has not been set.")
   }
+  env_var
 }
 
 get_env_var_aws_secret <- function() {
@@ -208,4 +211,5 @@ get_env_var_aws_secret <- function() {
   if(is.na(env_var)) {
     stop("The environment variable 'AWS_SECRET_ACCESS_KEY' has not been set.")
   }
+  env_var
 }
