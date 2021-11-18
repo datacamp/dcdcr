@@ -38,8 +38,6 @@ You can access any of the tables in the data connector by initializing
 it using the `data_connector` function and using autocomplete to access
 all the tables.
 
-![dc-autocomplete](man/figures/dc-autocomplete.png)
-
 By default the connector is set up to access data for the latest date.
 However, you can also pass a `date` argument to `dc_data_connector` to
 initialize it to access data for a specific date. This is useful when
@@ -49,31 +47,32 @@ specific date.
 ``` r
 library(dcdcr)
 dc <- data_connector()
-dc$tbl_assessment_dim()
-#> # A tibble: 14 × 4
-#>       id title                                   slug                 technology
-#>    <int> <chr>                                   <chr>                <chr>     
-#>  1  1874 Understanding and Interpreting Data     understanding-and-i… Theory    
-#>  2  1663 Data Manipulation with Python           data-manipulation-w… Python    
-#>  3  1649 R Programming                           r-programming        R         
-#>  4  1979 Data Visualization with R               data-visualization-… R         
-#>  5  1714 Machine Learning Fundamentals in Python machine-learning-fu… Python    
-#>  6  1735 Importing & Cleaning Data with R        importing-cleaning-… R         
-#>  7  1688 Machine Learning Fundamentals in R      machine-learning-fu… R         
-#>  8  1857 Data Visualization with Python          data-visualization-… Python    
-#>  9  1936 Statistics Fundamentals with R          statistics-fundamen… R         
-#> 10  1679 Python Programming                      python-programming   Python    
-#> 11  1815 Data Analysis in SQL (PostgreSQL)       data-analysis-in-sql SQL       
-#> 12  1645 Data Manipulation with R                data-manipulation-w… R         
-#> 13  1742 Importing & Cleaning Data with Python   importing-cleaning-… Python    
-#> 14  1882 Statistics Fundamentals with Python     statistics-fundamen… Python
+dc$assessment_dim()
 ```
+
+    #> # A tibble: 14 × 5
+    #>    assessment_id title                                   slug   technology    id
+    #>            <int> <chr>                                   <chr>  <chr>      <int>
+    #>  1          1874 Understanding and Interpreting Data     under… Theory      1874
+    #>  2          1663 Data Manipulation with Python           data-… Python      1663
+    #>  3          1649 R Programming                           r-pro… R           1649
+    #>  4          1979 Data Visualization with R               data-… R           1979
+    #>  5          1688 Machine Learning Fundamentals in R      machi… R           1688
+    #>  6          1735 Importing & Cleaning Data with R        impor… R           1735
+    #>  7          1936 Statistics Fundamentals with R          stati… R           1936
+    #>  8          1679 Python Programming                      pytho… Python      1679
+    #>  9          1815 Data Analysis in SQL (PostgreSQL)       data-… SQL         1815
+    #> 10          1645 Data Manipulation with R                data-… R           1645
+    #> 11          1742 Importing & Cleaning Data with Python   impor… Python      1742
+    #> 12          1882 Statistics Fundamentals with Python     stati… Python      1882
+    #> 13          1857 Data Visualization with Python          data-… Python      1857
+    #> 14          1714 Machine Learning Fundamentals in Python machi… Python      1714
 
 You can also print the documentation for each table by accessing the
 function using autocomplete, but NOT invoking it.
 
 ``` r
-dc$tbl_assessment_dim
+dc$assessment_dim
 ```
 
 ![dc-help](man/figures/dc-help.png)
