@@ -137,7 +137,7 @@ s3_tbl <- memoise(function(x, date = 'latest'){
 #' @importFrom tidyr nest
 s3_tbl_docs <- function(){
   docs_bic %>%
-    mutate(tbl_fun_name = paste0('tbl_', table_name)) %>%
+    mutate(tbl_fun_name =  table_name) %>%
     select(-table_name) %>%
     group_by(tbl_fun_name, table_description) %>%
     nest(column_comments = c(column, description))
@@ -153,7 +153,7 @@ s3_tbl_docs <- function(){
 #' @importFrom pointblank get_informant_report
 #' @importFrom snakecase to_title_case
 s3_help <- function(x){
-  .tbl_fun_name = paste0('tbl_', x)
+  .tbl_fun_name = x
   doc <- s3_tbl_docs() %>%
     filter(tbl_fun_name == .tbl_fun_name)
   
@@ -161,13 +161,17 @@ s3_help <- function(x){
     warning(sprintf("No documentation is available for %s.", x), call. = FALSE)
     return(invisible())
   }
+  
+  tbl_x <- s3_tbl(x)
+  
   column_comments <- doc %>%
     pull(column_comments) %>%
     extract2(1) %>%
+    filter(column %in% colnames(tbl_x)) %>% 
     as.list() %>%
     transpose()
 
-  informant <- s3_tbl(x) %>%
+  informant <- tbl_x %>%
     create_informant(
       tbl = .,
       label = 'Data Connector'
@@ -205,7 +209,7 @@ create_accessors_s3 <- function(date = 'latest', env){
     walk(~ {
       fun <- s3_tbl_binder(.x, date)
       class(fun) <- c('function_dc', class(fun))
-      fun_name <- paste0('tbl_', .x)
+      fun_name <- .x
       assign(fun_name, fun, envir = env)
     })
 }

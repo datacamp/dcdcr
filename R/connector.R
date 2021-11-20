@@ -26,7 +26,7 @@ data_connector <- function(date = "latest"){
       attr(fun, "table") <- .x
       fun
     }) %>%
-    set_names(paste0('tbl_', list_tables_s3()))
+    set_names(list_tables_s3())
   .tbl
 }
 

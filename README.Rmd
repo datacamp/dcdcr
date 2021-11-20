@@ -43,8 +43,6 @@ If in doubt, speak to your Customer Success Manager.
 
 You can access any of the tables in the data connector by initializing it using the `data_connector` function and using autocomplete to access all the tables.
 
-![dc-autocomplete](man/figures/dc-autocomplete.png)
-
 
 By default the connector is set up to access data for the latest date. However,
 you can also pass a `date` argument to `dc_data_connector` to initialize it to access data for a specific date. This is useful when you want to create reports
@@ -53,14 +51,14 @@ and want to pin your analysis to data as on a specific date.
 ```{r example}
 library(dcdcr)
 dc <- data_connector()
-dc$tbl_assessment_dim()
+dc$assessment_dim()
 ```
 
 You can also print the documentation for each table by accessing the function
 using autocomplete, but NOT invoking it.
 
 ```{r eval = FALSE}
-dc$tbl_assessment_dim
+dc$assessment_dim
 ```
 
 ![dc-help](man/figures/dc-help.png)

@@ -22,7 +22,7 @@ create_doc <- function(tbl_fun_name, column_comments, table_description, templat
     str_c(collapse = "\n")
   tpl_doc <- paste(
     readLines(
-      system.file(paste0('templates/', template), package = 'test9')
+      system.file(paste0('templates/', template), package = 'dcdcr')
     ),
     collapse = '\n'
   )

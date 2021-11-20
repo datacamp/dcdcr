@@ -1,4 +1,4 @@
 library(testthat)
-library(test9)
+library(dcdcr)
 
-test_check("test9")
+test_check("dcdcr")
