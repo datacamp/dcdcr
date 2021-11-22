@@ -1,6 +1,7 @@
 ---
 title: "Introduction"
 output: rmarkdown::html_vignette
+resource_files: ["dc-user-group-activity.png"]
 vignette: >
   %\VignetteIndexEntry{Introduction}
   %\VignetteEngine{knitr::rmarkdown}
@@ -62,17 +63,16 @@ data <- data.frame(
 timevis::timevis(data, width='100%', height = 175)
 ```
 
-
-<img src="../reference/figures/dc-user-group-activity.png" width='100%' />
-
-
 In this case, the fact tables for group 1234 will not contain data for User A
 for January 3rd (even though the user continued working on the course).
 
-
+```{r, echo = FALSE}
+knitr::include_graphics("dc-user-group-activity.png", dpi = 144)
+```
 
 ```{r echo = FALSE, warning = FALSE}
 docs_bic <- dcdcr:::docs_bic %>% 
+  dplyr::rename(column = column_name, description = column_description) %>% 
   mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
   tidyr::separate(
     table_name, 
@@ -100,7 +100,6 @@ display_doc <- function(.table_name){
 
 
 ```{r results='asis', echo = FALSE}
-.table_name <- 'exercise_dim'
 docs_bic %>% 
   filter(table_name != 'docs') %>% 
   arrange(content_type, desc(table_type)) %>% 
