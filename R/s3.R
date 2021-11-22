@@ -137,6 +137,7 @@ s3_tbl <- memoise(function(x, date = 'latest'){
 #' @importFrom tidyr nest
 s3_tbl_docs <- function(){
   docs_bic %>%
+    dplyr::rename(column = column_name, description = column_description) %>% 
     mutate(tbl_fun_name =  table_name) %>%
     select(-table_name) %>%
     group_by(tbl_fun_name, table_description) %>%
