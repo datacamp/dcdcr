@@ -136,12 +136,11 @@ s3_tbl <- memoise(function(x, date = 'latest'){
 #' @importFrom purrr transpose
 #' @importFrom tidyr nest
 s3_tbl_docs <- function(){
-  docs_bic %>%
-    dplyr::rename(column = column_name, description = column_description) %>% 
+  docs_bic %>%  
     mutate(tbl_fun_name =  table_name) %>%
     select(-table_name) %>%
     group_by(tbl_fun_name, table_description) %>%
-    nest(column_comments = c(column, description))
+    nest(column_comments = c(column_name, column_description))
 }
 
 #' Get help documents
@@ -168,7 +167,7 @@ s3_help <- function(x){
   column_comments <- doc %>%
     pull(column_comments) %>%
     extract2(1) %>%
-    filter(column %in% colnames(tbl_x)) %>% 
+    filter(column_name %in% colnames(tbl_x)) %>% 
     as.list() %>%
     transpose()
 
@@ -186,8 +185,8 @@ s3_help <- function(x){
   for (column in column_comments){
     informant <- informant %>%
       info_columns(
-        columns = column$column,
-        info = column$description
+        columns = column$column_name,
+        info = column$column_description
       )
   }
 

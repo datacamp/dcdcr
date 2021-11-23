@@ -26,7 +26,11 @@ data_connector <- function(date = "latest"){
       attr(fun, "table") <- .x
       fun
     }) %>%
-    set_names(list_tables_s3())
+    set_names(
+      list_tables_s3() %>% 
+        sub('^\\learning_', '', .)
+    )
+   docs_bic <<- .tbl$docs()
   .tbl
 }
 
