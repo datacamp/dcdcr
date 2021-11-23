@@ -72,7 +72,6 @@ knitr::include_graphics("dc-user-group-activity.png", dpi = 144)
 
 ```{r echo = FALSE, warning = FALSE}
 docs_bic <- dcdcr:::docs_bic %>% 
-  dplyr::rename(column = column_name, description = column_description) %>% 
   mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
   tidyr::separate(
     table_name, 
@@ -80,7 +79,7 @@ docs_bic <- dcdcr:::docs_bic %>%
     remove = FALSE
   ) %>% 
   group_by(table_name, content_type, table_type, table_description) %>% 
-  tidyr::nest(columns = c(column, description))
+  tidyr::nest(columns = c(column_name, column_description))
 
 
 
