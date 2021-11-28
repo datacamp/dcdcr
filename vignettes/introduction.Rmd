@@ -70,9 +70,10 @@ for January 3rd (even though the user continued working on the course).
 knitr::include_graphics("dc-user-group-activity.png", dpi = 144)
 ```
 
-```{r echo = FALSE, warning = FALSE}
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 docs_bic <- dcdcr:::docs_bic %>% 
   mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
+  filter(!grepl('v2', table_name)) %>% 
   tidyr::separate(
     table_name, 
     into = c('content_type', 'table_type'), 

@@ -14,7 +14,7 @@ data_connector <- function(date = "latest"){
       "Please add missing environment variables before accessing the data",
       "connector. If you are in DataCamp Workspace, you can do this using the" ,
       "Integrations tab in the sidebar on the left. If you are NOT in DataCamp",
-      "Wrkspace, it is recommended that you set these environment variables" ,
+      "Workspace, it is recommended that you set these environment variables" ,
       "in a .Rprofile file at the root of your project. e.g. ",
       "Sys.setenv(<ENV_VAR> = '...')"
     ))
@@ -30,7 +30,7 @@ data_connector <- function(date = "latest"){
       list_tables_s3() %>% 
         sub('^\\learning_', '', .)
     )
-   docs_bic <<- .tbl$docs()
+   options(dcdcr.docs_bic = .tbl$docs())
   .tbl
 }
 
