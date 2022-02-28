@@ -136,7 +136,7 @@ s3_tbl <- memoise(function(x, date = 'latest'){
 #' @importFrom purrr transpose
 #' @importFrom tidyr nest
 s3_tbl_docs <- function(){
-  docs_bic %>%  
+  getOption('dcdcr.docs_bic', docs_bic) %>%  
     mutate(tbl_fun_name =  table_name) %>%
     select(-table_name) %>%
     group_by(tbl_fun_name, table_description) %>%

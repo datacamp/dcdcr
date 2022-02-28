@@ -1,9 +1,9 @@
 ---
-title: "Introduction"
+title: "Explore Data Model"
 output: rmarkdown::html_vignette
 resource_files: ["dc-user-group-activity.png"]
 vignette: >
-  %\VignetteIndexEntry{Introduction}
+  %\VignetteIndexEntry{Explore Data Model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,35 +20,75 @@ library(dcdcr)
 library(dplyr)
 ```
 
-The data model for the dataconnector provides data on learning activity for users in a group across different content types. The currently supported content types are:
+The data model for the data connector provides data on learning activity for users in a group across different content types. The currently supported content types are:
 
 1. [Assessments](https://app.datacamp.com/learn/practice) 
+2. [Assignments](https://app.datacamp.com/group/assignments)
+3. [Certification](https://app.datacamp.com/certification)
 2. [Courses](https://app.datacamp.com/learn/courses)
 3. [Practice](https://app.datacamp.com/learn/practice)
 4. [Projects](https://app.datacamp.com/learn/project)
 5. [Tracks](https://app.datacamp.com/learn/skill-tracks)
+6. [Workspace](https://app.datacamp.com/workspace)
 
-For every content type, the data model provides a __fact table__ (e.g. `course_fact`) consisting of measures like XP and time spent, and a __dimension__ table (`course_dim`) consisting of descriptors like technology,
-topic etc. You can joining the fact tables with the dimension tables to summarize XP and time spent across technology, topic etc. 
+For every content type, the data model provides a __fact table__ (e.g. `course_fact`) consisting of measures like XP and time spent, and a __dimension__ table (`course_dim`) consisting of descriptors like technology, topic etc. You 
+can join the fact tables with the dimension tables to summarize XP and time 
+spent across technology, topic etc. 
 
 Additionally, the data model also provides dimension tables at the user level `user_dim`, `team_dim`, `group_dim`, and bridge tables `user_team_bridge` to facilitate analysis at the team or user level.
 
 For example, you can aggregate the `xp` gained and `time_spent` by week across `technology` and `team` with the following query.
 
+{% tabs %}
+
+{% tab title="SQL" %}
+
 ```sql
-SELECT week_start_date,
+SELECT team_id,
+       week_start_date,
        technology,
        SUM(xp) AS xp,
        SUM(time_spent)/3600 AS time_spent_hours
   FROM course_fact
-       INNER JOIN courses_dim USING(course_id)
+       INNER JOIN course_dim USING(course_id)
        INNER JOIN date_dim USING(date_id)
        INNER JOIN user_team_bridge USING(user_id)
        INNER JOIN team_dim USING(team_id)
+ GROUP BY 1, 2, 3
 ```
+
+{% endtab %}
+
+{% tab title="Python" %}
+
+```python
+from dcdcpy import DataConnector
+dc = DataConnector()
+(
+  dc.course_fact()
+    .merge(dc.course_dim(), on='course_id', suffixes=('', '_y'))
+    .merge(dc.date_dim(), left_on='date_id', right_on='id')
+    .merge(dc.user_team_bridge(), on='user_id')
+    .merge(dc.team_dim(), left_on='team_id', right_on='id')
+    .groupby(['week_start_date', 'technology'], as_index=False)
+    .agg({
+        'time_spent': lambda d: d.sum()/3600,
+        'xp': 'sum'
+    })
+)
+```
+
+{% endtab %}
+
+{% endtabs %}
+
+
+{% hint style='info' %}
 
 Note that all fact tables only include learning activity for the dates on which a user was a part of the group. For example, consider a user A who 
 joined group 1234 on Jan 1st, started a course on Jan 2nd, left the group on Jan 3rd while continuing to work on the course, rejoined the group on Jan 4th, and completed the course on Jan 5th.
+
+{% endhint %}
 
 
 
@@ -66,13 +106,91 @@ timevis::timevis(data, width='100%', height = 175)
 In this case, the fact tables for group 1234 will not contain data for User A
 for January 3rd (even though the user continued working on the course).
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, out.width='100%'}
 knitr::include_graphics("dc-user-group-activity.png", dpi = 144)
 ```
 
-```{r echo = FALSE, warning = FALSE}
+```{r echo = FALSE}
+table_group_order = c(
+  'assessment' = 1, 'assignment' = 2, 'certification' = 3,
+  'course' = 4, 'practice' = 5, 'project' = 6, 
+  'track' = 7, 'workspace' = 8, 'user_team' = 8, 'others' = 9
+)
+docs_bic <- dcdcr:::docs_bic %>% 
+  mutate(column_description = gsub('""', '"', column_description)) %>% 
+  mutate(column_description = gsub("\n", "", column_description)) %>% 
+  mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
+  filter(!grepl('v2', table_name)) %>% 
+  filter(table_name != 'docs') %>% 
+  arrange(table_name) %>% 
+  mutate(table_group = purrr::map_chr(table_name, ~ {
+    strsplit(.x, '_')[[1]][1]
+  })) %>% 
+  mutate(table_group = case_when(
+    table_group %in% c('workspace', 'publication') ~ 'workspace',
+    table_group %in% c('course', 'chapter', 'exercise') ~ 'course', 
+    table_group %in% c('team', 'user') ~ 'user_team',
+    table_group == 'xp' ~ 'other',
+    TRUE ~ table_group
+  )) %>% 
+  mutate(table_group_order = table_group_order[table_group]) %>%  
+  arrange(table_group_order) %>% 
+  group_by(table_group) %>%
+  tidyr::nest()
+```
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, results='asis'}
+display_table_group <- function(.table_group){
+  doc <- docs_bic %>% 
+    filter(table_group == .table_group)
+  title <- if (.table_group != 'practice'){
+    doc$table_group %>% 
+      paste0('s') %>% 
+      snakecase::to_title_case()
+  } else {
+    'Practice'
+  }
+   
+  cat(glue::glue('## {title}\n\n'))
+  doc_data <- doc %>% 
+    pull(data) %>% 
+    magrittr::extract2(1) 
+  
+  if (.table_group == 'course'){
+    doc_data <- doc_data %>% 
+      mutate(.order = case_when(
+        grepl('exercise', table_name) ~ 1,
+        grepl('chapter', table_name) ~ 2,
+        grepl('course', table_name) ~ 3
+      )) %>% 
+      arrange(.order, table_name) %>% 
+      select(-.order)
+  }
+  doc_data %>% 
+    group_by(table_name) %>% 
+    tidyr::nest(columns = c(column_name, column_description)) %>% 
+    as.list() %>% 
+    purrr::transpose() %>% 
+    purrr::walk(~ {
+      cat(glue::glue('### {snakecase::to_title_case(.x$table_name)}\n\n'))
+      cat(glue::glue('__`{.x$table_name}`__: '))
+      cat('\n', .x$table_description, "\n")
+      .x$columns %>% 
+        knitr::kable() %>% 
+        print()
+    })
+}
+
+docs_bic %>% 
+  pull(table_group) %>% 
+  purrr::walk(display_table_group)
+```
+
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, eval = FALSE}
 docs_bic <- dcdcr:::docs_bic %>% 
   mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
+  filter(!grepl('v2', table_name)) %>% 
   tidyr::separate(
     table_name, 
     into = c('content_type', 'table_type'), 
@@ -98,7 +216,7 @@ display_doc <- function(.table_name){
 ```
 
 
-```{r results='asis', echo = FALSE}
+```{r results='asis', echo = FALSE, eval = FALSE}
 docs_bic %>% 
   filter(table_name != 'docs') %>% 
   arrange(content_type, desc(table_type)) %>% 
