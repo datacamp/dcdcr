@@ -3,7 +3,7 @@ title: "Explore Data Model"
 output: rmarkdown::html_vignette
 resource_files: ["dc-user-group-activity.png"]
 vignette: >
-  %\VignetteIndexEntry{Introduction}
+  %\VignetteIndexEntry{Explore Data Model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,10 +23,13 @@ library(dplyr)
 The data model for the data connector provides data on learning activity for users in a group across different content types. The currently supported content types are:
 
 1. [Assessments](https://app.datacamp.com/learn/practice) 
+2. [Assignments](https://app.datacamp.com/group/assignments)
+3. [Certification](https://app.datacamp.com/certification)
 2. [Courses](https://app.datacamp.com/learn/courses)
 3. [Practice](https://app.datacamp.com/learn/practice)
 4. [Projects](https://app.datacamp.com/learn/project)
 5. [Tracks](https://app.datacamp.com/learn/skill-tracks)
+6. [Workspace](https://app.datacamp.com/workspace)
 
 For every content type, the data model provides a __fact table__ (e.g. `course_fact`) consisting of measures like XP and time spent, and a __dimension__ table (`course_dim`) consisting of descriptors like technology, topic etc. You 
 can join the fact tables with the dimension tables to summarize XP and time 
@@ -109,11 +112,13 @@ knitr::include_graphics("dc-user-group-activity.png", dpi = 144)
 
 ```{r echo = FALSE}
 table_group_order = c(
-  'assessment' = 1, 'course' = 2, 'practice' = 3, 'project' = 4, 
-  'track' = 5, 'user_team' = 6, 'others' = 7
+  'assessment' = 1, 'assignment' = 2, 'certification' = 3,
+  'course' = 4, 'practice' = 5, 'project' = 6, 
+  'track' = 7, 'workspace' = 8, 'user_team' = 8, 'others' = 9
 )
 docs_bic <- dcdcr:::docs_bic %>% 
   mutate(column_description = gsub('""', '"', column_description)) %>% 
+  mutate(column_description = gsub("\n", "", column_description)) %>% 
   mutate(table_name = gsub("learning\\_", "", table_name)) %>% 
   filter(!grepl('v2', table_name)) %>% 
   filter(table_name != 'docs') %>% 
@@ -122,6 +127,7 @@ docs_bic <- dcdcr:::docs_bic %>%
     strsplit(.x, '_')[[1]][1]
   })) %>% 
   mutate(table_group = case_when(
+    table_group %in% c('workspace', 'publication') ~ 'workspace',
     table_group %in% c('course', 'chapter', 'exercise') ~ 'course', 
     table_group %in% c('team', 'user') ~ 'user_team',
     table_group == 'xp' ~ 'other',
@@ -129,7 +135,7 @@ docs_bic <- dcdcr:::docs_bic %>%
   )) %>% 
   mutate(table_group_order = table_group_order[table_group]) %>%  
   arrange(table_group_order) %>% 
-  group_by(table_group) %>% 
+  group_by(table_group) %>%
   tidyr::nest()
 ```
 
