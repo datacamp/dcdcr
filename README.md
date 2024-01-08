@@ -6,12 +6,18 @@
 <!-- badges: start -->
 
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+deprecated](https://img.shields.io/badge/lifecycle-deprecated-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#deprecated)
 <!-- badges: end -->
 
 This package contains utilities to work with DataCamp Data Connector. It
 is designed to be used by administrators and managers of DataCamp
 groups. Some prior experience of writing reports with R is recommended.
+
+## DEPRECATION WARNING
+
+Warning, this package is no longer actively maintained! Please see the
+[announcement](https://enterprise-docs.datacamp.com/data-connector/data-connector-faq/deprecating-dcdcpy-and-dcdcr)
+for more information and alternatives.
 
 ## Installation
 
@@ -49,24 +55,6 @@ library(dcdcr)
 dc <- data_connector()
 dc$assessment_dim()
 ```
-
-    #> # A tibble: 14 × 5
-    #>    assessment_id title                                   slug   technology    id
-    #>            <int> <chr>                                   <chr>  <chr>      <int>
-    #>  1          1874 Understanding and Interpreting Data     under… Theory      1874
-    #>  2          1663 Data Manipulation with Python           data-… Python      1663
-    #>  3          1649 R Programming                           r-pro… R           1649
-    #>  4          1979 Data Visualization with R               data-… R           1979
-    #>  5          1688 Machine Learning Fundamentals in R      machi… R           1688
-    #>  6          1735 Importing & Cleaning Data with R        impor… R           1735
-    #>  7          1936 Statistics Fundamentals with R          stati… R           1936
-    #>  8          1679 Python Programming                      pytho… Python      1679
-    #>  9          1815 Data Analysis in SQL (PostgreSQL)       data-… SQL         1815
-    #> 10          1645 Data Manipulation with R                data-… R           1645
-    #> 11          1742 Importing & Cleaning Data with Python   impor… Python      1742
-    #> 12          1882 Statistics Fundamentals with Python     stati… Python      1882
-    #> 13          1857 Data Visualization with Python          data-… Python      1857
-    #> 14          1714 Machine Learning Fundamentals in Python machi… Python      1714
 
 You can also print the documentation for each table by accessing the
 function using autocomplete, but NOT invoking it.
